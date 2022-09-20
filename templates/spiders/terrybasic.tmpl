@@ -145,7 +145,7 @@ class $classname(RedisSpider):
         for url in response.xpath('//a/@href').extract():
             if url.startswith("http"):
                 pass
-            elif item.startswith("tel:") or item.startswith("mailto:"):
+            elif url.startswith("tel:") or url.startswith("mailto:"):
                 continue
             else:
                 url = os.path.join(self.base_url, url)
