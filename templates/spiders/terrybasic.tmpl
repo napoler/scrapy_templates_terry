@@ -1,0 +1,155 @@
+# -*- coding: utf-8 -*-
+import os.path
+import scrapy
+from scrapy import Request
+from tkitreadability import tkitReadability
+import time
+# from ..items import *
+from scrapy_redis.spiders import RedisSpider
+"""
+terrybasic.tmpl
+当前文件需要放入python包所在地，
+比如site-packages/scrapy/templates/spiders/。
+
+use it
+> scrapy genspider -t terrybasic  test test.com
+
+"""
+
+class ${classname}Item(scrapy.Item):
+    """
+    内容基本,can move to items.py
+
+    """
+    # define the fields for your item here like:
+    mongodb_spiders = ['$name']
+    # test it first
+    #mongodb_collections = ['content']
+    mongodb_collections = ['test_content']
+
+    content_type = scrapy.Field()
+    title=scrapy.Field()
+    content=scrapy.Field()
+    content_html=scrapy.Field()
+    url=scrapy.Field()
+    category=scrapy.Field()
+    image_urls=scrapy.Field()
+    images=scrapy.Field()
+    pass
+
+# class $classname(scrapy.Spider):
+class $classname(RedisSpider):
+    """$classname
+
+    """
+
+    name = '$name'
+    allowed_domains = ['$domain']
+    start_urls = ['https://$domain/']
+    base_url = "https://$domain"
+    img_url = "https://$domain"
+
+    # 这里覆盖默认的settings配置,custom_settings settings.py
+    custom_settings = dict(
+        MONGODB_URI="mongodb://192.168.1.18:27017/",
+        REDIS_URL = 'redis://192.168.1.18:6379',  # 指定redis的地址
+        POOL_PROXY = "http://192.168.1.18:5010"
+
+    )
+    redis_key = f'{name}:start_urls'  # 即启动爬虫的命令，参考格式：redis_key =
+
+    def parse(self, response):
+        """
+        解析链接
+
+        :param response:
+        :return:
+        """
+        for item in response.xpath('//a/@href').extract():
+            # print(item)
+            if item.startswith("http"):
+                url = item
+                pass
+            elif item.startswith("tel:") or item.startswith("mailto:"):
+                continue
+            else:
+                url = os.path.join(self.base_url, item)
+            # if "articles" in url:
+            # 解析内容
+            yield response.follow(url, callback=self.parse_content)
+
+
+    def parse_content(self, response):
+        """
+        解析内容
+
+        :param response:
+        :return:
+        """
+        # 断言内容是文本
+        assert response.text
+
+        # 标题
+        # content_type=self.name
+        xpath_title='//h1[@class="hero-title"]'
+        # xpath_content='//div[contains(@class,"article--main-content-wrapper")]/div[@class="node__contentr"]'
+        xpath_content='//article//div[contains(@class,"entry-content")]'
+
+        xpath_removes=['//article//div[contains(@class,"entry-content")]//div[contains(@class,"topad")]','//article//div[contains(@class,"entry-content")]//div[contains(@class,"left")]']
+
+        # save to items
+        items = ${classname}Item()
+
+        if response.xpath(xpath_title) and response.xpath(xpath_content):
+            # 使用同义的数据格式
+
+            # 修改爬虫名称
+            # items.mongodb_spiders = [self.name]
+            items['content_type'] = self.name
+            # items["title"] = response.xpath(f'{xpath_title}/text()').extract()[0]
+            items["title"] = response.xpath(f'{xpath_title}/text()').get()
+
+            # 使用自动正则方案获取正文
+            # html = response.xpath(xpath_content).extract()[0]
+            html = response.xpath(xpath_content).get()
+
+            for xpath_remove in xpath_removes:
+                xpath_remove_html = response.xpath(xpath_remove).get()
+                if xpath_remove_html and html:
+                    html=html.replace(html, xpath_remove_html)
+
+            Readability = tkitReadability()
+            content = Readability.html2markdown(html,images_with_size=False)
+            items["content"] = content
+
+            if len(items["content"].split(" ")) > 128:
+
+                # 收集全部数据。带有html
+                items["content_html"] = html
+
+                srcs = []
+                for s in response.xpath(f'{xpath_content}//img/@src').extract():
+                    if s.startswith('http') or s.startswith("data:image"):
+                        srcs.append(s)
+                    else:
+                        # print(self.img_url+s)
+                        srcs.append(self.img_url + s)
+
+                items["image_urls"] = srcs
+                items["url"] = response.url
+                yield items
+
+
+        # print("解析内容")
+        # print(response.xpath('/html').extract())
+        for url in response.xpath('//a/@href').extract():
+            if url.startswith("http"):
+                pass
+            elif item.startswith("tel:") or item.startswith("mailto:"):
+                continue
+            else:
+                url = os.path.join(self.base_url, url)
+
+            yield response.follow(url, callback=self.parse_content)
+
+
