@@ -123,9 +123,8 @@ class $classname(RedisSpider):
 
             for xpath_remove in xpath_removes:
 
-                if xpath_remove_html and html:
-                    for xpath_remove_html_one in response.xpath(xpath_remove).extract():
-                    html=html.replace(xpath_remove_html_one,'')
+                for xpath_remove_html_one in response.xpath(xpath_remove).extract():
+                html=html.replace(xpath_remove_html_one,'')
 
             Readability = tkitReadability()
             content = Readability.html2markdown(html,images_with_size=False)
