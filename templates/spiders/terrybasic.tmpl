@@ -107,7 +107,7 @@ class $classname(RedisSpider):
         # save to items
         items = ${classname}Item()
 
-        if response.xpath(xpath_title) and response.xpath(xpath_content):
+        if len(response.xpath(xpath_title))==1 and len(response.xpath(xpath_content))>0:
             # 使用同义的数据格式
 
             # 修改爬虫名称
