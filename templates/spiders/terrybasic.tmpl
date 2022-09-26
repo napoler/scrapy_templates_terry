@@ -88,6 +88,7 @@ class $classname(RedisSpider):
         """
         # 断言内容是文本
         assert response.text
+        content_limit=128
 
         # 标题
         # content_type=self.name
@@ -95,7 +96,13 @@ class $classname(RedisSpider):
         # xpath_content='//div[contains(@class,"article--main-content-wrapper")]/div[@class="node__contentr"]'
         xpath_content='//article//div[contains(@class,"entry-content")]'
 
-        xpath_removes=['//article//div[contains(@class,"entry-content")]//div[contains(@class,"topad")]','//article//div[contains(@class,"entry-content")]//div[contains(@class,"left")]']
+        xpath_content_img=None
+
+        # need remove items
+        xpath_removes=[]
+        # 删除表格
+        xpath_removes.append('//body[contains(@class,"node-article")]//article//div[contains(@class,"articleContainer__content")]//div[contains(@class,"component") and contains(@class,"table-of-contents")]')
+
 
         # save to items
         items = ${classname}Item()
@@ -122,12 +129,21 @@ class $classname(RedisSpider):
             content = Readability.html2markdown(html,images_with_size=False)
             items["content"] = content
 
-            if len(items["content"].split(" ")) > 128:
+            if len(items["content"].split(" ")) > content_limit:
 
                 # 收集全部数据。带有html
                 items["content_html"] = html
 
                 srcs = []
+                # image source
+                if xpath_content_img is not None:
+                    for s in response.xpath(f'{xpath_content_img}//img/@src').extract():
+                        if s.startswith('http') or s.startswith("data:image"):
+                            srcs.append(s)
+                        else:
+                            # print(self.img_url+s)
+                            srcs.append(self.img_url + s)
+
                 for s in response.xpath(f'{xpath_content}//img/@src').extract():
                     if s.startswith('http') or s.startswith("data:image"):
                         srcs.append(s)
