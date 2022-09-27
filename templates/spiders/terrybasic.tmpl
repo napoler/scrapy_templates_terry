@@ -102,7 +102,7 @@ class $classname(RedisSpider):
         # need remove items
         xpath_removes=[]
         # 删除表格
-        xpath_removes.append('//body[contains(@class,"node-article")]//article//div[contains(@class,"articleContainer__content")]//div[contains(@class,"component") and contains(@class,"table-of-contents")]')
+        #xpath_removes.append('//body[contains(@class,"node-article")]//article//div[contains(@class,"articleContainer__content")]//div[contains(@class,"component") and contains(@class,"table-of-contents")]')
 
 
         # save to items
@@ -122,9 +122,7 @@ class $classname(RedisSpider):
             html = response.xpath(xpath_content).get()
 
             for xpath_remove in xpath_removes:
-
-                for xpath_remove_html_one in response.xpath(xpath_remove).extract():
-                html=html.replace(xpath_remove_html_one,'')
+                response.xpath(xpath_remove).remove():
 
             Readability = tkitReadability()
             content = Readability.html2markdown(html,images_with_size=False)
