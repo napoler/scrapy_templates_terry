@@ -150,7 +150,7 @@ class $classname(RedisSpider):
                         # print(self.img_url+s)
                         srcs.append(self.img_url + s)
 
-                items["image_urls"] = srcs
+                items["image_urls"] = list(set(srcs))
                 items["url"] = response.url
                 yield items
 
