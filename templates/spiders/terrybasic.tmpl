@@ -116,13 +116,13 @@ class $classname(RedisSpider):
             items['content_type'] = self.name
             # items["title"] = response.xpath(f'{xpath_title}/text()').extract()[0]
             items["title"] = response.xpath(f'{xpath_title}/text()').get()
-
+            for xpath_remove in xpath_removes:
+                response.xpath(xpath_remove).remove():
             # 使用自动正则方案获取正文
             # html = response.xpath(xpath_content).extract()[0]
             html = response.xpath(xpath_content).get()
 
-            for xpath_remove in xpath_removes:
-                response.xpath(xpath_remove).remove():
+
 
             Readability = tkitReadability()
             content = Readability.html2markdown(html,images_with_size=False)
