@@ -6,6 +6,7 @@ from tkitreadability import tkitReadability
 import time
 # from ..items import *
 from scrapy_redis.spiders import RedisSpider
+from bs4 import BeautifulSoup as bs
 """
 terrybasic.tmpl
 当前文件需要放入python包所在地，
@@ -122,7 +123,14 @@ class $classname(RedisSpider):
             # html = response.xpath(xpath_content).extract()[0]
             html = response.xpath(xpath_content).get()
 
-
+            # 修改html内容
+            #soup=bs(html, 'html.parser')
+            #for img in soup.findAll('img'):
+            #    #修正图片地址
+            #    if 'data-load-src' in img.attrs.keys():
+            #        img['src'] = img.attrs['data-load-src']
+            #html=str(soup)
+            # 修正html内容结束
 
             Readability = tkitReadability()
             content = Readability.html2markdown(html,images_with_size=False)
