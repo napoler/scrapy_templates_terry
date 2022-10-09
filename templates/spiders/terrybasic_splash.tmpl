@@ -70,7 +70,9 @@ class $classname(RedisSpider):
         SPIDER_MIDDLEWARES={
             "scrapy_splash.SplashDeduplicateArgsMiddleware": 100,
             "scrapy_redis.dupefilter.RFPDupeFilter":101
-        }
+        },
+        DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter',
+        HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 
     )
     redis_key = f'{name}:start_urls'  # 即启动爬虫的命令，参考格式：redis_key =
