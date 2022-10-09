@@ -71,7 +71,7 @@ class $classname(RedisSpider):
             "scrapy_splash.SplashDeduplicateArgsMiddleware": 100,
             "scrapy_redis.dupefilter.RFPDupeFilter":101
         },
-        DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter',
+        #DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter',
         HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage',
         CONCURRENT_REQUESTS_PER_IP = 4,
         CONCURRENT_REQUESTS_PER_DOMAIN = 4
