@@ -76,6 +76,9 @@ class $classname(RedisSpider):
 
     )
     redis_key = f'{name}:start_urls'  # 即启动爬虫的命令，参考格式：redis_key =
+    def start_requests(self):
+        for url in self.start_urls:
+            yield SplashRequest(url, self.parse, args={'wait': 0.5})
 
     def parse(self, response):
         """
@@ -95,7 +98,22 @@ class $classname(RedisSpider):
                 url = os.path.join(self.base_url, item)
             # if "articles" in url:
             # 解析内容
-            yield response.follow(url, callback=self.parse_content)
+            yield SplashRequest(
+                url,
+                self.parse_content,
+                args={
+                    # optional; parameters passed to Splash HTTP API
+                    'wait': 0.5,
+                    # 'url': url
+
+                    # 'url' is prefilled from request url
+                    # 'http_method' is set to 'POST' for POST requests
+                    # 'body' is set to request body for POST requests
+                },
+                # endpoint='render.json', # optional; default is render.html
+                # splash_url='<url>',     # optional; overrides SPLASH_URL
+                # slot_policy=scrapy_splash.SlotPolicy.PER_DOMAIN,  # optional
+            )
 
 
     def parse_content(self, response):
@@ -190,6 +208,22 @@ class $classname(RedisSpider):
             else:
                 url = os.path.join(self.base_url, url)
 
-            yield response.follow(url, callback=self.parse_content)
+            # yield response.follow(url, callback=self.parse_content)
+            yield SplashRequest(
+                url,
+                self.parse_content,
+                args={
+                    # optional; parameters passed to Splash HTTP API
+                    'wait': 0.5,
+                    # 'url': url
+
+                    # 'url' is prefilled from request url
+                    # 'http_method' is set to 'POST' for POST requests
+                    # 'body' is set to request body for POST requests
+                },
+                # endpoint='render.json', # optional; default is render.html
+                # splash_url='<url>',     # optional; overrides SPLASH_URL
+                # slot_policy=scrapy_splash.SlotPolicy.PER_DOMAIN,  # optional
+            )
 
 
