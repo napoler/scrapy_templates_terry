@@ -58,13 +58,14 @@ class $classname(RedisSpider):
         #MONGODB_URI="mongodb://192.168.1.18:27017/",
         #REDIS_URL = 'redis://192.168.1.18:6379',  # 指定redis的地址
         #POOL_PROXY = "http://192.168.1.18:5010"
-
-        DUPEFILTER_CLASS = 'tkit_scrapy_mongo.dupefilter.RFPDupeFilter',
+        CONCURRENT_REQUESTS_PER_IP = 4,
+        CONCURRENT_REQUESTS_PER_DOMAIN = 4,
+        #DUPEFILTER_CLASS = 'tkit_scrapy_mongo.dupefilter.RFPDupeFilter',
         # 去重复
-        SPIDER_MIDDLEWARES={
+        #SPIDER_MIDDLEWARES={
             # "scrapy_splash.SplashDeduplicateArgsMiddleware": 100,
-            "tkit_scrapy_mongo.dupefilter.RFPDupeFilter":101
-        }
+         #   "tkit_scrapy_mongo.dupefilter.RFPDupeFilter":101
+        #}
     )
     redis_key = f'{name}:start_urls'  # 即启动爬虫的命令，参考格式：redis_key =
 
